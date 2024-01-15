@@ -1,16 +1,21 @@
 package hexlet.code;
 
+import hexlet.code.controller.RootController;
 import hexlet.code.repository.BaseRepository;
+import hexlet.code.util.NamedRouters;
 import io.javalin.Javalin;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
+import gg.jte.ContentType;
+import gg.jte.TemplateEngine;
+import io.javalin.rendering.template.JavalinJte;
+import gg.jte.resolve.ResourceCodeResolver;
+
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.sql.SQLException;
 import java.util.stream.Collectors;
 
@@ -48,11 +53,13 @@ public class App {
 
         BaseRepository.dataSource = dataSource;
 
+        JavalinJte.init(createTemplateEngine());
+
         var app = Javalin.create(config -> {
             config.plugins.enableDevLogging();
         });
 
-        app.get("/", ctx -> ctx.result(jdbcUrl));
+        app.get(NamedRouters.rootPath(), RootController::index);
 
         return app;
     }
@@ -64,6 +71,13 @@ public class App {
     private static int getPort() {
         String port = System.getenv().getOrDefault("PORT", "7070");
         return Integer.valueOf(port);
+    }
+
+    private static TemplateEngine createTemplateEngine() {
+        ClassLoader classLoader = App.class.getClassLoader();
+        ResourceCodeResolver codeResolver = new ResourceCodeResolver("templates", classLoader);
+        TemplateEngine templateEngine = TemplateEngine.create(codeResolver, ContentType.Html);
+        return templateEngine;
     }
 
 }
