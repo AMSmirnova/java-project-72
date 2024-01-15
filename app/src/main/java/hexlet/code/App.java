@@ -5,17 +5,17 @@ import io.javalin.Javalin;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.sql.SQLException;
 import java.util.stream.Collectors;
 
 
 public class App {
-
-//    final String JDBC_DATABASE_DEFAULT = "jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;";
-//    final String PORT_DEFAULT = "7070";
 
     public static void main(String[] args) throws IOException, SQLException {
         var app = getApp();
@@ -36,10 +36,10 @@ public class App {
         }
 
         var dataSource = new HikariDataSource(hikariConfig);
-        var url = App.class.getClassLoader().getResource("schema.sql");
-        var file = new File(url.getFile());
-        var sql = Files.lines(file.toPath())
-                .collect(Collectors.joining("\n"));
+
+        var inputStream = App.class.getClassLoader().getResourceAsStream("schema.sql");
+        var reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+        var sql = reader.lines().collect(Collectors.joining("\n"));
 
         try (var connection = dataSource.getConnection();
                 var statement = connection.createStatement()) {
