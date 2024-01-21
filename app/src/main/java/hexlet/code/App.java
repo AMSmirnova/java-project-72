@@ -14,6 +14,7 @@ import io.javalin.rendering.template.JavalinJte;
 import gg.jte.resolve.ResourceCodeResolver;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
@@ -22,12 +23,12 @@ import java.util.stream.Collectors;
 
 public class App {
 
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) throws SQLException, IOException {
         var app = getApp();
         app.start(getPort());
     }
 
-    public static Javalin getApp() throws SQLException {
+    public static Javalin getApp() throws SQLException, IOException {
 
         var hikariConfig = new HikariConfig();
         var jdbcUrl = getJDBCUrl();
@@ -41,10 +42,7 @@ public class App {
         }
 
         var dataSource = new HikariDataSource(hikariConfig);
-
-        var inputStream = App.class.getClassLoader().getResourceAsStream("schema.sql");
-        var reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
-        var sql = reader.lines().collect(Collectors.joining("\n"));
+        var sql = readResourceFile("schema.sql");
 
         try (var connection = dataSource.getConnection();
                 var statement = connection.createStatement()) {
@@ -70,6 +68,13 @@ public class App {
 //        {driver}:{provider}://{host}:{port}/{db}?password={password}&user={user}
 //        jdbc:postgresql://dpg-cmg5lsnqd2ns739pq600-a.frankfurt-postgres.render.com:5432/page_analyzer_database_tqq4?password=vQRdviEreMIpZXPdUaBwNgEl45EcFoai&user=page_analyzer_database_tqq4_user
 //        postgres://p        dpg-cmg5lsnqd2ns739pq600-a.frankfurt-postgres.render.com
+    }
+
+    private static String readResourceFile(String fileName) throws IOException {
+        var inputStream = App.class.getClassLoader().getResourceAsStream(fileName);
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+            return reader.lines().collect(Collectors.joining("\n"));
+        }
     }
 
     private static String getJDBCUrl() {
