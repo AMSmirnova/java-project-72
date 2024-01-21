@@ -65,8 +65,11 @@ public class App {
         app.get(NamedRoutes.urlPath("{id}"), UrlsController::show);
 
         System.out.println(jdbcUrl);
-
         return app;
+
+//        {driver}:{provider}://{host}:{port}/{db}?password={password}&user={user}
+//        jdbc:postgresql://dpg-cmg5lsnqd2ns739pq600-a.frankfurt-postgres.render.com:5432/page_analyzer_database_tqq4?password=vQRdviEreMIpZXPdUaBwNgEl45EcFoai&user=page_analyzer_database_tqq4_user
+//        postgres://p        dpg-cmg5lsnqd2ns739pq600-a.frankfurt-postgres.render.com
     }
 
     private static String getJDBCUrl() {

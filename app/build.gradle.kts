@@ -18,6 +18,7 @@ repositories {
 dependencies {
     implementation("com.h2database:h2:2.2.220")
     implementation("com.zaxxer:HikariCP:5.1.0")
+    implementation("org.postgresql:postgresql:42.7.1")
 
     implementation("io.javalin:javalin:5.6.3")
     implementation("io.javalin:javalin-rendering:5.6.3")
