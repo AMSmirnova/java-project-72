@@ -33,16 +33,20 @@ public class App {
         var hikariConfig = new HikariConfig();
         var jdbcUrl = getJDBCUrl();
 
+        String sql;
+
         if (jdbcUrl.equals("jdbc:h2:mem:project")) {
             hikariConfig.setJdbcUrl("jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;");
+            sql = readResourceFile("schema.sql");
         } else {
             hikariConfig.setUsername(System.getenv("JDBC_DATABASE_USERNAME"));
             hikariConfig.setPassword(System.getenv("JDBC_DATABASE_PASSWORD"));
             hikariConfig.setJdbcUrl(jdbcUrl);
+            sql = readResourceFile("schema2.sql");
         }
 
         var dataSource = new HikariDataSource(hikariConfig);
-        var sql = readResourceFile("schema.sql");
+//        var sql = readResourceFile("schema.sql");
 
         try (var connection = dataSource.getConnection();
                 var statement = connection.createStatement()) {
