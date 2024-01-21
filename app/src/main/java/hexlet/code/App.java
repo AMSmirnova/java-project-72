@@ -1,8 +1,9 @@
 package hexlet.code;
 
 import hexlet.code.controller.RootController;
+import hexlet.code.controller.UrlsController;
 import hexlet.code.repository.BaseRepository;
-import hexlet.code.util.NamedRouters;
+import hexlet.code.util.NamedRoutes;
 import io.javalin.Javalin;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -13,7 +14,6 @@ import io.javalin.rendering.template.JavalinJte;
 import gg.jte.resolve.ResourceCodeResolver;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
@@ -22,12 +22,12 @@ import java.util.stream.Collectors;
 
 public class App {
 
-    public static void main(String[] args) throws IOException, SQLException {
+    public static void main(String[] args) throws SQLException {
         var app = getApp();
         app.start(getPort());
     }
 
-    public static Javalin getApp() throws IOException, SQLException {
+    public static Javalin getApp() throws SQLException {
 
         var hikariConfig = new HikariConfig();
         var jdbcUrl = getJDBCUrl();
@@ -59,13 +59,18 @@ public class App {
             config.plugins.enableDevLogging();
         });
 
-        app.get(NamedRouters.rootPath(), RootController::index);
+        app.get(NamedRoutes.rootPath(), RootController::index);
+        app.get(NamedRoutes.urlsPath(), UrlsController::index);
+        app.post(NamedRoutes.urlsPath(), UrlsController::create);
+        app.get(NamedRoutes.urlPath("{id}"), UrlsController::show);
+
+        System.out.println(jdbcUrl);
 
         return app;
     }
 
     private static String getJDBCUrl() {
-        return System.getenv().getOrDefault("JDBC_DATABASE_URL", "jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;");
+        return System.getenv().getOrDefault("JDBC_DATABASE_URL", "jdbc:h2:mem:project");
     }
 
     private static int getPort() {
