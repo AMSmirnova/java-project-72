@@ -4,6 +4,8 @@ import hexlet.code.controller.RootController;
 import hexlet.code.controller.UrlsController;
 import hexlet.code.repository.BaseRepository;
 import hexlet.code.util.NamedRoutes;
+import hexlet.code.util.Data;
+
 import io.javalin.Javalin;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -13,12 +15,9 @@ import gg.jte.TemplateEngine;
 import io.javalin.rendering.template.JavalinJte;
 import gg.jte.resolve.ResourceCodeResolver;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
-import java.util.stream.Collectors;
+
 
 
 public class App {
@@ -29,31 +28,7 @@ public class App {
     }
 
     public static Javalin getApp() throws SQLException, IOException {
-
-        var hikariConfig = new HikariConfig();
-        var jdbcUrl = getJDBCUrl();
-
-        String sql;
-
-        if (jdbcUrl.equals("jdbc:h2:mem:project")) {
-            hikariConfig.setJdbcUrl("jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;");
-            sql = readResourceFile("schema.sql");
-        } else {
-            hikariConfig.setUsername(System.getenv("JDBC_DATABASE_USERNAME"));
-            hikariConfig.setPassword(System.getenv("JDBC_DATABASE_PASSWORD"));
-            hikariConfig.setJdbcUrl(jdbcUrl);
-            sql = readResourceFile("schema2.sql");
-        }
-
-        var dataSource = new HikariDataSource(hikariConfig);
-
-        try (var connection = dataSource.getConnection();
-                var statement = connection.createStatement()) {
-            statement.execute(sql);
-        }
-
-        BaseRepository.dataSource = dataSource;
-
+        connectDataBase();
         JavalinJte.init(createTemplateEngine());
 
         var app = Javalin.create(config -> {
@@ -65,20 +40,37 @@ public class App {
         app.post(NamedRoutes.urlsPath(), UrlsController::create);
         app.get(NamedRoutes.urlPath("{id}"), UrlsController::show);
 
-        System.out.println(jdbcUrl);
         return app;
     }
 
-    private static String readResourceFile(String fileName) throws IOException {
-        var inputStream = App.class.getClassLoader().getResourceAsStream(fileName);
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream,
-                StandardCharsets.UTF_8))) {
-            return reader.lines().collect(Collectors.joining("\n"));
+    private static void connectDataBase() throws SQLException, IOException {
+        var hikariConfig = new HikariConfig();
+        var jdbcUrl = getJDBCUrl();
+
+        String sql;
+
+        if (jdbcUrl.equals("jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;")) {
+            sql = Data.readResourceFile("schema.sql");
+        } else {
+            hikariConfig.setUsername(System.getenv("JDBC_DATABASE_USERNAME"));
+            hikariConfig.setPassword(System.getenv("JDBC_DATABASE_PASSWORD"));
+            sql = Data.readResourceFile("schema2.sql");
         }
+        hikariConfig.setJdbcUrl(jdbcUrl);
+
+        var dataSource = new HikariDataSource(hikariConfig);
+
+        try (var connection = dataSource.getConnection();
+             var statement = connection.createStatement()) {
+            statement.execute(sql);
+        }
+
+        BaseRepository.dataSource = dataSource;
+        System.out.println(jdbcUrl); // delete!!!!!
     }
 
     private static String getJDBCUrl() {
-        return System.getenv().getOrDefault("JDBC_DATABASE_URL", "jdbc:h2:mem:project");
+        return System.getenv().getOrDefault("JDBC_DATABASE_URL", "jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;");
     }
 
     private static int getPort() {
