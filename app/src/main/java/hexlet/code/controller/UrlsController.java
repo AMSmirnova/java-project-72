@@ -4,14 +4,13 @@ import hexlet.code.dto.urls.UrlPage;
 import hexlet.code.dto.urls.UrlsPage;
 import hexlet.code.model.Url;
 import hexlet.code.repository.UrlRepository;
+import hexlet.code.util.Data;
 import hexlet.code.util.NamedRoutes;
 import io.javalin.http.Context;
 import io.javalin.http.NotFoundResponse;
 
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Collections;
@@ -31,14 +30,11 @@ public class UrlsController {
     public static void create(Context ctx) throws SQLException {
 
         var input = ctx.formParamAsClass("url", String.class)
-                .get()
-                .toLowerCase()
-                .trim();
+                .get();
         String normUrl;
 
         try {
-            URL url = new URI(input).toURL();
-            normUrl = url.getProtocol() + "://" + url.getAuthority();
+            normUrl = Data.normalizeUrl(input);
         } catch (URISyntaxException | MalformedURLException | IllegalArgumentException e) {
             ctx.sessionAttribute("flash", "Некорректный URL");
             ctx.sessionAttribute("flash-type", "danger");
@@ -63,7 +59,7 @@ public class UrlsController {
     public static void show(Context ctx) throws SQLException {
         var id = ctx.pathParamAsClass("id", Long.class).get();
         var url = UrlRepository.find(id)
-                .orElseThrow(() -> new NotFoundResponse("url not found"));
+                .orElseThrow(() -> new NotFoundResponse("url with id = " + id + " not found"));
 
         var page = new UrlPage(url);
         ctx.render("urls/show.jte", Collections.singletonMap("page", page));

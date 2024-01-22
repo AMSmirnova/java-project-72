@@ -58,13 +58,44 @@ public class AppTest {
     }
 
     @Test
-    public void testUrlPage() throws SQLException {
+    public void testUrlPage() {
+        JavalinTest.test(app, (server, client) -> {
+            var requestBody = "url=www.example.com";
+            var response = client.post("/urls/", requestBody);
+            assertThat(response.code()).isEqualTo(200);
+            assertThat(response.body().string()).contains("www.example.com");
+        });
+    }
+
+    @Test
+    public void addSameUrl() throws SQLException {
         var date = new Date();
         Url url = new Url("www.example.com", new Timestamp(date.getTime()));
         UrlRepository.save(url);
+
         JavalinTest.test(app, (server, client) -> {
-            var response = client.get("/urls/" + url.getId());
+            var requestBody = "url=www.example.com";
+            var response = client.post("/urls/", requestBody);
             assertThat(response.code()).isEqualTo(200);
+            assertThat(UrlRepository.getEntities()).hasSize(1);
+        });
+    }
+
+    @Test
+    public void addIncorrectUrl() {
+        JavalinTest.test(app, (server, client) -> {
+            var requestBody = "url=example";
+            var response = client.post("/urls/", requestBody);
+            assertThat(response.code()).isEqualTo(200);
+            assertThat(UrlRepository.getEntities()).hasSize(0);
+        });
+    }
+
+    @Test
+    public void testNoExistPage() {
+        JavalinTest.test(app, (server, client) -> {
+            var response = client.get("/urls" + 333L);
+            assertThat(response.code()).isEqualTo(404);
         });
     }
 }
