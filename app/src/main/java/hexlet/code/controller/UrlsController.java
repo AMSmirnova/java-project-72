@@ -3,6 +3,7 @@ package hexlet.code.controller;
 import hexlet.code.dto.urls.UrlPage;
 import hexlet.code.dto.urls.UrlsPage;
 import hexlet.code.model.Url;
+import hexlet.code.repository.CheckRepository;
 import hexlet.code.repository.UrlRepository;
 import hexlet.code.util.Data;
 import hexlet.code.util.NamedRoutes;
@@ -49,7 +50,9 @@ public class UrlsController {
         } else {
             var date = new Date();
             Url url = new Url(normUrl, new Timestamp(date.getTime()));
+
             UrlRepository.save(url);
+
             ctx.sessionAttribute("flash", "Страница успешно добавлена");
             ctx.sessionAttribute("flash-type", "success");
             ctx.redirect(NamedRoutes.urlsPath());
@@ -60,8 +63,9 @@ public class UrlsController {
         var id = ctx.pathParamAsClass("id", Long.class).get();
         var url = UrlRepository.find(id)
                 .orElseThrow(() -> new NotFoundResponse("url with id = " + id + " not found"));
-
+        url.setUrlChecks(CheckRepository.getEntities(id));
         var page = new UrlPage(url);
+
         ctx.render("urls/show.jte", Collections.singletonMap("page", page));
     }
 }

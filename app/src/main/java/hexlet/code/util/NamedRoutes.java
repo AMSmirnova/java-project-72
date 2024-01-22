@@ -12,11 +12,16 @@ public class NamedRoutes {
     public static String urlPath(String id) {
         return "/urls/" + id;
     }
+
     public static String urlPath(Long id) {
         return urlPath(id.toString());
     }
 
-    public static String errorPath() {
-        return "/error";
+    public static String checksPath(String id) {
+        return "urls/" + id + "/checks";
+    }
+
+    public static String checksPath(Long id) {
+        return checksPath(id.toString());
     }
 }

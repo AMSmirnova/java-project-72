@@ -22,6 +22,9 @@ checkstyle {
 }
 
 dependencies {
+
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.16.1")
+
     implementation("com.h2database:h2:2.2.220")
     implementation("com.zaxxer:HikariCP:5.1.0")
     implementation("org.postgresql:postgresql:42.7.1")
@@ -32,6 +35,9 @@ dependencies {
     implementation("org.slf4j:slf4j-simple:2.0.7")
     implementation("org.projectlombok:lombok:1.18.26")
     implementation("gg.jte:jte:3.1.0")
+
+    implementation("com.konghq:unirest-java:3.14.5")
+    implementation ("org.jsoup:jsoup:1.17.1")
 
     testImplementation("org.assertj:assertj-core:3.24.2") // assertThat()
     testImplementation(platform("org.junit:junit-bom:5.9.1"))

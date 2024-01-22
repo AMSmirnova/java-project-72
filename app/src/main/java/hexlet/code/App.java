@@ -1,5 +1,6 @@
 package hexlet.code;
 
+import hexlet.code.controller.CheckController;
 import hexlet.code.controller.RootController;
 import hexlet.code.controller.UrlsController;
 import hexlet.code.repository.BaseRepository;
@@ -39,6 +40,7 @@ public class App {
         app.get(NamedRoutes.urlsPath(), UrlsController::index);
         app.post(NamedRoutes.urlsPath(), UrlsController::create);
         app.get(NamedRoutes.urlPath("{id}"), UrlsController::show);
+        app.post(NamedRoutes.checksPath("{id}"), CheckController::createCheck);
 
         return app;
     }
@@ -66,7 +68,6 @@ public class App {
         }
 
         BaseRepository.dataSource = dataSource;
-        System.out.println(jdbcUrl); // delete!!!!!
     }
 
     private static String getJDBCUrl() {
