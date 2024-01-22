@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class UrlRepository extends BaseRepository{
+public class UrlRepository extends BaseRepository {
 
     public static void save(Url url) throws SQLException {
         String sql = "INSERT INTO urls (name, created_at) VALUES (?, ?)";
@@ -30,17 +30,17 @@ public class UrlRepository extends BaseRepository{
         var sql = "SELECT * FROM urls";
         try (var conn = dataSource.getConnection();
             var stmt = conn.prepareStatement(sql)) {
-                var resultSet = stmt.executeQuery();
-                var result = new ArrayList<Url>();
-                while (resultSet.next()) {
-                    var id = resultSet.getLong("id");
-                    var name = resultSet.getString("name");
-                    var createdAt = resultSet.getTimestamp("created_at");
-                    var url = new Url(name, createdAt);
-                    url.setId(id);
-                    result.add(url);
-                }
-                return result;
+            var resultSet = stmt.executeQuery();
+            var result = new ArrayList<Url>();
+            while (resultSet.next()) {
+                var id = resultSet.getLong("id");
+                var name = resultSet.getString("name");
+                var createdAt = resultSet.getTimestamp("created_at");
+                var url = new Url(name, createdAt);
+                url.setId(id);
+                result.add(url);
+            }
+            return result;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -49,7 +49,7 @@ public class UrlRepository extends BaseRepository{
     public static Optional<Url> find(Long id) throws SQLException {
         var sql = "SELECT * FROM urls WHERE id = ?";
         try (var conn = dataSource.getConnection();
-        var stmt = conn.prepareStatement(sql)) {
+             var stmt = conn.prepareStatement(sql)) {
             stmt.setLong(1, id);
             var resultSet = stmt.executeQuery();
             if (resultSet.next()) {

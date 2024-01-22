@@ -20,7 +20,7 @@ import java.util.Date;
 
 public class UrlsController {
 
-    public static void index(Context ctx){
+    public static void index(Context ctx) {
         var urls = UrlRepository.getEntities();
         var page = new UrlsPage(urls);
         page.setFlash(ctx.consumeSessionAttribute("flash"));
@@ -30,35 +30,34 @@ public class UrlsController {
 
     public static void create(Context ctx) throws SQLException {
 
-            var input = ctx.formParamAsClass("url", String.class)
-                    .get()
-                    .toLowerCase()
-                    .trim();
-            String normUrl;
+        var input = ctx.formParamAsClass("url", String.class)
+                .get()
+                .toLowerCase()
+                .trim();
+        String normUrl;
 
-            try {
-                URL url = new URI(input).toURL();
-                normUrl = url.getProtocol() + "://" + url.getAuthority();
-            } catch (URISyntaxException | MalformedURLException | IllegalArgumentException e) {
-                ctx.sessionAttribute("flash", "Некорректный URL");
-                ctx.sessionAttribute("flash-type", "danger");
-                ctx.redirect(NamedRoutes.rootPath());
-                return;
-            }
+        try {
+            URL url = new URI(input).toURL();
+            normUrl = url.getProtocol() + "://" + url.getAuthority();
+        } catch (URISyntaxException | MalformedURLException | IllegalArgumentException e) {
+            ctx.sessionAttribute("flash", "Некорректный URL");
+            ctx.sessionAttribute("flash-type", "danger");
+            ctx.redirect(NamedRoutes.rootPath());
+            return;
+        }
 
-            if (UrlRepository.existName(normUrl)) {
-                ctx.sessionAttribute("flash", "Страница уже существует");
-                ctx.sessionAttribute("flash-type", "primary");
-                ctx.redirect(NamedRoutes.urlsPath());
-            } else {
-                var date = new Date();
-                Url url = new Url(normUrl, new Timestamp(date.getTime()));
-                UrlRepository.save(url);
-                ctx.sessionAttribute("flash", "Страница успешно добавлена");
-                ctx.sessionAttribute("flash-type", "success");
-                ctx.redirect(NamedRoutes.urlsPath());
-            }
-
+        if (UrlRepository.existName(normUrl)) {
+            ctx.sessionAttribute("flash", "Страница уже существует");
+            ctx.sessionAttribute("flash-type", "primary");
+            ctx.redirect(NamedRoutes.urlsPath());
+        } else {
+            var date = new Date();
+            Url url = new Url(normUrl, new Timestamp(date.getTime()));
+            UrlRepository.save(url);
+            ctx.sessionAttribute("flash", "Страница успешно добавлена");
+            ctx.sessionAttribute("flash-type", "success");
+            ctx.redirect(NamedRoutes.urlsPath());
+        }
     }
 
     public static void show(Context ctx) throws SQLException {
