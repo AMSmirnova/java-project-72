@@ -4,7 +4,6 @@ plugins {
     id("io.freefair.lombok") version "8.3"
     id("checkstyle")
     id ("jacoco")
-    id ("com.adarshr.test-logger") version "4.0.0"
 }
 
 application {
@@ -39,18 +38,15 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
 
-jacoco {
-    toolVersion = "0.8.9"
-    reportsDirectory = layout.buildDirectory.dir("customJacocoReportDir")
-}
-
-
 tasks.test {
     useJUnitPlatform()
     finalizedBy(tasks.jacocoTestReport)
 }
 
 tasks.jacocoTestReport {
-    dependsOn(tasks.test)
+    reports {
+        xml.required = true
+    }
 }
+
 
