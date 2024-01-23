@@ -1,11 +1,8 @@
 package hexlet.code;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
+
 import hexlet.code.model.Url;
-import hexlet.code.repository.BaseRepository;
 import hexlet.code.repository.UrlRepository;
-import hexlet.code.util.Data;
 import io.javalin.Javalin;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -24,20 +21,6 @@ public class AppTest {
 
     @BeforeEach
     public final void setUp() throws SQLException, IOException {
-        var hikariConfig = new HikariConfig();
-        var jdbcUrl = "jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;";
-        hikariConfig.setJdbcUrl(jdbcUrl);
-
-        String sql = Data.readResourceFile("schema.sql");
-
-        var dataSource = new HikariDataSource(hikariConfig);
-
-        try (var connection = dataSource.getConnection();
-             var statement = connection.createStatement()) {
-            statement.execute(sql);
-        }
-
-        BaseRepository.dataSource = dataSource;
         app = App.getApp();
     }
 

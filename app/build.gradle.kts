@@ -38,6 +38,7 @@ dependencies {
 
     implementation("com.konghq:unirest-java:3.14.5")
     implementation ("org.jsoup:jsoup:1.17.1")
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
 
     testImplementation("org.assertj:assertj-core:3.24.2") // assertThat()
     testImplementation(platform("org.junit:junit-bom:5.9.1"))

@@ -19,8 +19,10 @@ import gg.jte.resolve.ResourceCodeResolver;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import lombok.extern.slf4j.Slf4j;
 
 
+@Slf4j
 public class App {
 
     public static void main(String[] args) throws SQLException, IOException {
@@ -49,19 +51,16 @@ public class App {
         var hikariConfig = new HikariConfig();
         var jdbcUrl = getJDBCUrl();
 
-        String sql;
-
-        if (jdbcUrl.equals("jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;")) {
-            sql = Data.readResourceFile("schema.sql");
-        } else {
+        if (!jdbcUrl.equals("jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;")) {
             hikariConfig.setUsername(System.getenv("JDBC_DATABASE_USERNAME"));
             hikariConfig.setPassword(System.getenv("JDBC_DATABASE_PASSWORD"));
-            sql = Data.readResourceFile("schema2.sql");
         }
+
         hikariConfig.setJdbcUrl(jdbcUrl);
 
         var dataSource = new HikariDataSource(hikariConfig);
-
+        String sql = Data.readResourceFile("schema2.sql");
+        log.info(sql);
         try (var connection = dataSource.getConnection();
              var statement = connection.createStatement()) {
             statement.execute(sql);
@@ -85,5 +84,4 @@ public class App {
         TemplateEngine templateEngine = TemplateEngine.create(codeResolver, ContentType.Html);
         return templateEngine;
     }
-
 }
