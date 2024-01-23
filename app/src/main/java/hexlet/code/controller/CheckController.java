@@ -1,7 +1,5 @@
 package hexlet.code.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.model.UrlCheck;
 import hexlet.code.repository.CheckRepository;
 import hexlet.code.repository.UrlRepository;
