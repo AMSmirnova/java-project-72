@@ -1,6 +1,9 @@
 @import hexlet.code.dto.urls.UrlsPage
 @import hexlet.code.util.NamedRoutes
+@import java.time.format.DateTimeFormatter
 @param UrlsPage page
+
+!{var formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");}
 
 @template.layout.page(
     content = @`
@@ -30,10 +33,16 @@
                     <tbody>
                         @for (var url : page.getUrls())
                             <tr>
-                                <th class="col-1">${url.getId()}</th>
+                                <th>${url.getId()}</th>
                                 <th><a href="${NamedRoutes.urlPath(url.getId())}">${url.getName()}</a></th>
-                                <th class="col-2"></th>
-                                <th class="col-1"></th>
+
+                                @if (url.getUrlChecks().isEmpty())
+                                    <th></th>
+                                    <th></th>
+                                @else
+                                    <th class="col-2">${url.getLastUrlCheck().getCreatedAt().toLocalDateTime().format(formatter)}</th>
+                                    <th class="col-1">${url.getLastUrlCheck().getStatusCode()}</th>
+                                @endif
                             </tr>
                         @endfor
                     </tbody>

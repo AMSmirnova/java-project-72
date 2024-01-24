@@ -13,10 +13,7 @@ import io.javalin.http.NotFoundResponse;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.Collections;
-import java.util.Date;
-
 
 public class UrlsController {
 
@@ -48,9 +45,7 @@ public class UrlsController {
             ctx.sessionAttribute("flash-type", "primary");
             ctx.redirect(NamedRoutes.urlsPath());
         } else {
-            var date = new Date();
-            Url url = new Url(normUrl, new Timestamp(date.getTime()));
-
+            Url url = new Url(normUrl);
             UrlRepository.save(url);
 
             ctx.sessionAttribute("flash", "Страница успешно добавлена");
@@ -64,7 +59,12 @@ public class UrlsController {
         var url = UrlRepository.find(id)
                 .orElseThrow(() -> new NotFoundResponse("url with id = " + id + " not found"));
         url.setUrlChecks(CheckRepository.getEntities(id));
+        var lastUrlCheck = CheckRepository.findLatestCheck(id)
+                .orElse(null);
+        url.setLastUrlCheck(lastUrlCheck);
         var page = new UrlPage(url);
+        page.setFlash(ctx.consumeSessionAttribute("flash"));
+        page.setFlashType(ctx.consumeSessionAttribute("flash-type"));
 
         ctx.render("urls/show.jte", Collections.singletonMap("page", page));
     }

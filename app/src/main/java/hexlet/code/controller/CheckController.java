@@ -11,11 +11,10 @@ import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 
 public class CheckController {
     public static void createCheck(Context ctx) throws SQLException {
@@ -25,21 +24,28 @@ public class CheckController {
         try {
             HttpResponse<String> response = Unirest.get(url.getName()).asString();
             var status = response.getStatus();
-            Document doc = Jsoup.parse(response.getBody());
-            var title = doc.getElementsByTag("title").isEmpty()
-                    ? "" : doc.getElementsByTag("title").html();
-            var h1 = doc.getElementsByTag("h1").isEmpty()
-                    ? "" : doc.getElementsByTag("h1").html();
-            Elements metaTags = doc.getElementsByAttributeValue("name", "description");
+            if (status == 404) {
+                throw new NotFoundResponse();
+            }
+            Document document = Jsoup.parse(response.getBody());
+            String title = document.title();
+
+            Element h1Element = document.selectFirst("h1");
+            var h1 = h1Element != null ? h1Element.text() : "";
+
+            Elements metaTags = document.getElementsByAttributeValue("name", "description");
             String description = metaTags.isEmpty() ? "" : metaTags.get(0).attr("content");
 
-            var createdAt = Timestamp.valueOf(LocalDateTime.now());
-            var urlCheck = new UrlCheck(status, title, h1, description, urlId, createdAt);
+            var urlCheck = new UrlCheck(status, title, h1, description, urlId);
 
             CheckRepository.save(urlCheck);
 
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+            ctx.sessionAttribute("flash", "Проверка успешно добавлена");
+            ctx.sessionAttribute("flash-type", "success");
+
+        } catch (NotFoundResponse e) {
+            ctx.sessionAttribute("flash", "Некорректный URL");
+            ctx.sessionAttribute("flash-type", "danger");
         }
         ctx.redirect(NamedRoutes.urlPath(urlId));
     }

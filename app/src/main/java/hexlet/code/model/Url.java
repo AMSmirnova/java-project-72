@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -12,10 +13,10 @@ public class Url {
     private Long id;
     private String name;
     private Timestamp createdAt;
-    private List<UrlCheck> urlChecks;
+    private List<UrlCheck> urlChecks = new ArrayList<>();
+    private UrlCheck lastUrlCheck;
 
-    public Url(String name, Timestamp createdAt) {
+    public Url(String name) {
         this.name = name;
-        this.createdAt = createdAt;
     }
 }
