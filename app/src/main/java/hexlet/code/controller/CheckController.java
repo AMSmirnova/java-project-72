@@ -16,6 +16,7 @@ import org.jsoup.select.Elements;
 
 import java.sql.SQLException;
 
+
 public class CheckController {
     public static void createCheck(Context ctx) throws SQLException {
         var urlId = ctx.pathParamAsClass("id", Long.class).get();
@@ -24,9 +25,6 @@ public class CheckController {
         try {
             HttpResponse<String> response = Unirest.get(url.getName()).asString();
             var status = response.getStatus();
-            if (status == 404) {
-                throw new NotFoundResponse();
-            }
             Document document = Jsoup.parse(response.getBody());
             String title = document.title();
 
@@ -43,7 +41,7 @@ public class CheckController {
             ctx.sessionAttribute("flash", "Проверка успешно добавлена");
             ctx.sessionAttribute("flash-type", "success");
 
-        } catch (NotFoundResponse e) {
+        } catch (Exception e) {
             ctx.sessionAttribute("flash", "Некорректный URL");
             ctx.sessionAttribute("flash-type", "danger");
         }

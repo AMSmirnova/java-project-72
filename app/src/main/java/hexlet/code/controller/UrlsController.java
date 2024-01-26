@@ -5,7 +5,7 @@ import hexlet.code.dto.urls.UrlsPage;
 import hexlet.code.model.Url;
 import hexlet.code.repository.CheckRepository;
 import hexlet.code.repository.UrlRepository;
-import hexlet.code.util.Data;
+import hexlet.code.util.Utils;
 import hexlet.code.util.NamedRoutes;
 import io.javalin.http.Context;
 import io.javalin.http.NotFoundResponse;
@@ -32,7 +32,7 @@ public class UrlsController {
         String normUrl;
 
         try {
-            normUrl = Data.normalizeUrl(input);
+            normUrl = Utils.normalizeUrl(input);
         } catch (URISyntaxException | MalformedURLException | IllegalArgumentException e) {
             ctx.sessionAttribute("flash", "Некорректный URL");
             ctx.sessionAttribute("flash-type", "danger");

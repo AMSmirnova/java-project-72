@@ -8,7 +8,6 @@
 @template.layout.page(
     content = @`
 
-
             <section>
                 <div class="container-fluid">
                     @if(page != null && page.getFlash() != null)

@@ -5,7 +5,7 @@ import hexlet.code.controller.RootController;
 import hexlet.code.controller.UrlsController;
 import hexlet.code.repository.BaseRepository;
 import hexlet.code.util.NamedRoutes;
-import hexlet.code.util.Data;
+import hexlet.code.util.Utils;
 
 import io.javalin.Javalin;
 import com.zaxxer.hikari.HikariConfig;
@@ -59,7 +59,7 @@ public class App {
         hikariConfig.setJdbcUrl(jdbcUrl);
 
         var dataSource = new HikariDataSource(hikariConfig);
-        String sql = Data.readResourceFile("schema2.sql");
+        String sql = Utils.readResourceFile("schema.sql");
         log.info(sql);
         try (var connection = dataSource.getConnection();
              var statement = connection.createStatement()) {

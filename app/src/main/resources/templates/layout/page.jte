@@ -32,14 +32,6 @@
             </div>
         </nav>
 
-<%--        <div class="container-fluid">--%>
-<%--            @if(page != null && page.getFlash() != null)--%>
-<%--                <div class="alert alert-${page.getFlashType()}" role="alert">--%>
-<%--                    ${page.getFlash()}--%>
-<%--                </div>--%>
-<%--            @endif--%>
-<%--        </div>--%>
-
         <main class="flex-grow-1">
 
             ${content}

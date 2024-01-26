@@ -13,7 +13,7 @@ import java.nio.charset.StandardCharsets;
 
 import java.util.stream.Collectors;
 
-public class Data {
+public class Utils {
     public static String readResourceFile(String fileName) throws IOException {
         var inputStream = App.class.getClassLoader().getResourceAsStream(fileName);
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream,
