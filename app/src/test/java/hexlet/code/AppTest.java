@@ -70,12 +70,13 @@ public class AppTest {
     }
 
     @Test
-    public void testUrlPage() {
+    public void testSaveUrlPage() {
         JavalinTest.test(app, (server, client) -> {
             var requestBody = "url=www.example.com";
             var response = client.post("/urls/", requestBody);
             assertThat(response.code()).isEqualTo(200);
             assertThat(response.body().string()).contains("www.example.com");
+            assertThat(UrlRepository.existName("www.example.com"));
         });
     }
 
